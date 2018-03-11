@@ -1,13 +1,14 @@
 # 8 Channel RS485 MODBUS RTU relay board type R421A08
 
-This is a Python example to control the relay board with a USB - RS485 dongle.
-Python 2 and 3 are supported.
+This Python example can control up to 64 individual 8 channel relay boards from the command line by 
+using a USB - RS485 dongle. It has been tested with board type R421A08 with Python 2 and 3 on 
+Windows, but should work on Linux as well.
 
 ## Hardware
 
-This following hardware is required for this project:
+The following hardware is required for this project:
 
-### R421A08 relay board:
+### R421A08 relay board
 
 ![R421A08 board](https://raw.githubusercontent.com/Erriez/R421A08-rs485-8ch-relay-board/master/images/R421A08.png)
 
@@ -16,22 +17,38 @@ This following hardware is required for this project:
 * Current one relay: ~26mA
 * Current all relays on: ~220mA
 
-### RS485 - USB dongle:
+**WARNING: DO NOT USE THIS RELAY BOARD WITH 230V AC!**  
+The distance between relay traces on the PCB are < 2mm without holes for isolation. This is 
+dangerous when using it with high voltages. See the picture above.
+
+### RS485 - USB dongle
 
 This project requires a USB to RS485 dongle, for example:
 
 ![RS485 - USB dongle](https://raw.githubusercontent.com/Erriez/R421A08-rs485-8ch-relay-board/master/images/RS485_USB_dongle.png)
 
+* On Windows, open the ```Device Manager``` | ```Ports (COM & LPT)``` to find the ```USB-SERIAL 
+CH340 (COMxx)``` serial port.
+* On Linux, use the ```dmesg``` command  to find the serial port, such as ```/dev/ttyUSB0```.
+
 ## RS485 RTU MODBUS communication protocol
 
-This is an open binary communication protocol. This relay board does **not** support ASCII mode.
+This is an open binary serial communication protocol.
 
 * Serial port at 9600 baud, 8 databits, 1 stop, no parity.
-* The board supports MODBUS RTU protocol only.
-* The board supports 64 addresses, configurable with 6 DIP switches. 
-* The board does not support ACII mode.
-* The board does not broadcasts.
+* This board supports MODBUS RTU protocol only.
+* This board supports 64 addresses, configurable with 6 DIP switches. 
+* This board does **not** support ACII mode.
+* This board does **not** support broadcasts.
 * All relays are off after power-on.
+
+## Source
+Support for Python 2 and 3 with PySerial module.
+
+[Source R421A08.py](https://github.com/Erriez/R421A08-rs485-8ch-relay-board/blob/master/R421A08.py)
+
+## Documentation
+[MODBUS Application Protocol Specification v1.1.b](www.modbus.org/docs/Modbus_Application_Protocol_V1_1b.pdf)
 
 ## Installation PySerial Windows
 ```bash
