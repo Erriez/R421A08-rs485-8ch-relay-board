@@ -48,7 +48,7 @@ Support for Python 2 and 3 with PySerial module.
 [Source R421A08.py](https://github.com/Erriez/R421A08-rs485-8ch-relay-board/blob/master/R421A08.py)
 
 ## Documentation
-[MODBUS Application Protocol Specification v1.1.b](www.modbus.org/docs/Modbus_Application_Protocol_V1_1b.pdf)
+[MODBUS Application Protocol Specification v1.1.b](http://www.modbus.org/docs/Modbus_Application_Protocol_V1_1b.pdf)
 
 ## Installation PySerial Windows
 ```bash
