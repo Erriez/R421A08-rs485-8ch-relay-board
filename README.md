@@ -45,7 +45,7 @@ $ sudo python3 -m pip install pyserial
 ```
 
 ## Usage
-```bash
+```
 c:\Python36\python.exe R421A08.py -h
 usage: R421A08.py [-h] [-v] [-i] [-r [RELAY [RELAY ...]]] [-s] [-1] [-0] [-t]
                   [-l] [-m] [-d DELAY]
@@ -74,33 +74,57 @@ optional arguments:
 ```
 
 ### Board address 1, turn relay 1 on
-```bash
+Turn relay 1 on.  
+Replace the relay number between 1 and 8.  
+Abbreviation arguments are supported: replace ```--relay``` with ```-r```. 
+```
 python R421A08.py COM3 1 --relay 1 --on
 ```
 
 ### Board address 1, turn all relays on
-```bash
+```
 python R421A08.py COM3 1 --relay * --on
 ```
 
 ### Board address 1, turn relay 1 off
-```bash
+```
 python R421A08.py COM3 1 --relay 1 --off
 ```
 
-### Board address 1, toggle relay 2
-```bash
-python R421A08.py COM3 1 --relay 2 --toggle
+### Board address 1, toggle relay 1
+Toggle relay: on -> off and off -> on.
+```
+python R421A08.py COM3 1 --relay 1 --toggle
+```
+
+### Board address 1, latch relay 1
+Turn all relays off, except one.
+```
+python R421A08.py COM3 1 --relay 1 --latch
+```
+
+### Board address 1, momentary relay 1
+Turn relay on for 1 second, then turn it off.
+```
+python R421A08.py COM3 1 --relay 1 --momentary
+```
+
+### Board address 1, delay relay 1
+Turn relay on for a specific delay in seconds, then turn it off.
+```
+python R421A08.py COM3 1 --relay 1 --delay 3
 ```
 
 ### Board address 1, read status relay 1
-```bash
+Read status of one relay.
+```
 python R421A08.py COM3 1 --relay 1 --status
 Relay 1: OFF
 ```
 
 ### Board address 1, read status all relay's
-```bash
+Read status of all relays.
+```
 python R421A08.py COM3 1 --relay * --status
 Relay 1: ON
 Relay 2: OFF
@@ -112,8 +136,9 @@ Relay 7: ON
 Relay 8: OFF
 ```
 
-### Listen all addresses
-```bash
+### Listen: Print frames from all addresses
+For debug purposes, print all receiving frames.
+```
 python  R421A08.py COM3 0 --listen
 Listening for all incoming frames.
 Press CTRL+C to abort.
@@ -121,19 +146,23 @@ RX 16:  02 06 00 02 01 00 29 9A 01 06 00 02 01 00 29 9A
 RX 16:  01 06 00 01 01 00 D9 9A 01 06 00 01 01 00 D9 9A
 RX 16:  01 06 00 01 02 00 D9 6A 01 06 00 01 02 00 D9 6A
 RX 16:  01 06 00 01 03 00 D8 FA 01 06 00 01 03 00 D8 FA
+...
 ```
 
-### Listen address 2
-```bash
+### Listen: Print frames from address 2 only
+For debug purposes, print receiving frames from one address.
+```
 python  R421A08.py COM3 2 --listen
-Listening for all incoming frames.
+Listening for incoming frames from address 2.
 Press CTRL+C to abort.
 RX 16:  02 06 00 01 01 00 D9 A9 02 06 00 01 01 00 D9 A9
 RX 16:  02 06 00 01 02 00 D9 59 02 06 00 01 02 00 D9 59
+...
 ```
 
 ### Verbose
-```bash
+For debug purposes, print transmit and receive frames in HEX.
+```
 python R421A08.py COM3 1 --relay * --on -v
 Turn relay(s) [1, 2, 3, 4, 5, 6, 7, 8] on...
 TX 8:  01 06 00 01 01 00 D9 9A
