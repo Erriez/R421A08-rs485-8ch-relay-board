@@ -38,7 +38,8 @@ This is an open binary serial communication protocol.
 * Serial port at 9600 baud, 8 databits, 1 stop, no parity.
 * This board supports MODBUS RTU protocol only.
 * This board supports 64 addresses, configurable with 6 DIP switches. 
-* This board does **not** support ACII mode.
+* This board does **not** support ASCII mode, but can be send with the Python```--send``` option.
+* This board does **not** support AT commands.
 * This board does **not** support broadcasts.
 * All relays are off after power-on.
 
@@ -65,13 +66,13 @@ $ sudo python3 -m pip install pyserial
 ```
 c:\Python36\python.exe R421A08.py -h
 usage: R421A08.py [-h] [-v] [-i] [-r [RELAY [RELAY ...]]] [-s] [-1] [-0] [-t]
-                  [-l] [-m] [-d DELAY]
+                  [-l] [-m] [-d DELAY] [--send FRAME] [-n]
                   SERIAL_PORT ADDRESS
 
 8 Channel RS485 RTU relay board type R421A08
 
 positional arguments:
-  SERIAL_PORT           Serial port (such as COM1)
+  SERIAL_PORT           Serial port (such as COM1 or /dev/ttyUSB0)
   ADDRESS               Slave address [0..63]
 
 optional arguments:
@@ -85,9 +86,14 @@ optional arguments:
   -0, --off             Off
   -t, --toggle          Toggle
   -l, --latch           Latch
-  -m, --moment          Momentary
+  -m, --momentary       Momentary
   -d DELAY, --delay DELAY
                         Delay (0..255 seconds)
+  --send FRAME          Transmit MODBUS frame in ASCII hex, such as
+                        ":010600010100" or "01 06 00 01 01 00" or "0x01, 0x06,
+                        0x00, 0x01, 0x01, 0x00". CRC is automatically added to
+                        the end of the frame.
+  -n, --no-crc          Do not add CRC to --send frame
 ```
 
 ### Board address 1, turn relay 1 on
@@ -95,54 +101,54 @@ Turn relay 1 on.
 Replace the relay number between 1 and 8.  
 Abbreviation arguments are supported: replace ```--relay``` with ```-r```. 
 ```
-python R421A08.py COM3 1 --relay 1 --on
+python R421A08.py COM1 1 --relay 1 --on
 ```
 
 ### Board address 1, turn all relays on
 ```
-python R421A08.py COM3 1 --relay * --on
+python R421A08.py COM1 1 --relay * --on
 ```
 
 ### Board address 1, turn relay 1 off
 ```
-python R421A08.py COM3 1 --relay 1 --off
+python R421A08.py COM1 1 --relay 1 --off
 ```
 
 ### Board address 1, toggle relay 1
 Toggle relay: on -> off and off -> on.
 ```
-python R421A08.py COM3 1 --relay 1 --toggle
+python R421A08.py COM1 1 --relay 1 --toggle
 ```
 
 ### Board address 1, latch relay 1
 Turn all relays off, except one.
 ```
-python R421A08.py COM3 1 --relay 1 --latch
+python R421A08.py COM1 1 --relay 1 --latch
 ```
 
 ### Board address 1, momentary relay 1
 Turn relay on for 1 second, then turn it off.
 ```
-python R421A08.py COM3 1 --relay 1 --momentary
+python R421A08.py COM1 1 --relay 1 --momentary
 ```
 
 ### Board address 1, delay relay 1
 Turn relay on for a specific delay in seconds, then turn it off.
 ```
-python R421A08.py COM3 1 --relay 1 --delay 3
+python R421A08.py COM1 1 --relay 1 --delay 3
 ```
 
 ### Board address 1, read status relay 1
 Read status of one relay.
 ```
-python R421A08.py COM3 1 --relay 1 --status
+python R421A08.py COM1 1 --relay 1 --status
 Relay 1: OFF
 ```
 
 ### Board address 1, read status all relay's
 Read status of all relays.
 ```
-python R421A08.py COM3 1 --relay * --status
+python R421A08.py COM1 1 --relay * --status
 Relay 1: ON
 Relay 2: OFF
 Relay 3: ON
@@ -156,7 +162,7 @@ Relay 8: OFF
 ### Listen: Print frames from all addresses
 For debug purposes, print all receiving frames.
 ```
-python  R421A08.py COM3 0 --listen
+python  R421A08.py COM1 0 --listen
 Listening for all incoming frames.
 Press CTRL+C to abort.
 RX 16:  02 06 00 02 01 00 29 9A 01 06 00 02 01 00 29 9A
@@ -169,7 +175,7 @@ RX 16:  01 06 00 01 03 00 D8 FA 01 06 00 01 03 00 D8 FA
 ### Listen: Print frames from address 2 only
 For debug purposes, print receiving frames from one address.
 ```
-python  R421A08.py COM3 2 --listen
+python  R421A08.py COM1 2 --listen
 Listening for incoming frames from address 2.
 Press CTRL+C to abort.
 RX 16:  02 06 00 01 01 00 D9 A9 02 06 00 01 01 00 D9 A9
@@ -177,10 +183,45 @@ RX 16:  02 06 00 01 02 00 D9 59 02 06 00 01 02 00 D9 59
 ...
 ```
 
+### Send MODBUS raw ASCII hex command
+
+Send frame with adding CRC:
+
+```
+python R421A08.py COM1 1 --send ":010600010100"
+TX 8:  01 06 00 01 02 00 D9 9A
+RX 8:  01 06 00 01 02 00 D9 9A
+
+python R421A08.py COM1 1 --send "01 06 00 01 01 00"
+TX 8:  01 06 00 01 01 00 D9 9A
+RX 8:  01 06 00 01 01 00 D9 9A
+
+python R421A08.py COM1 1 --send "0x01, 0x06, 0x00, 0x01, 0x01, 0x00"
+TX 8:  01 06 00 01 01 00 D9 9A
+RX 8:  01 06 00 01 01 00 D9 9A
+```
+
+Send frame without adding CRC:
+
+```
+python R421A08.py COM1 1 --send ":010600010100D99A" --no-crc
+TX 8:  01 06 00 01 02 00 D9 9A
+RX 8:  01 06 00 01 02 00 D9 9A
+
+python R421A08.py COM1 1 --send "01 06 00 01 01 00 D9 9A" --no-crc
+TX 8:  01 06 00 01 01 00 D9 9A
+RX 8:  01 06 00 01 01 00 D9 9A
+
+python R421A08.py COM1 1 --send "0x01, 0x06, 0x00, 0x01, 0x01, 0x00, 0xD9, 0x9A" --no-crc
+TX 8:  01 06 00 01 01 00 D9 9A
+RX 8:  01 06 00 01 01 00 D9 9A
+```
+
 ### Verbose
+
 For debug purposes, print transmit and receive frames in HEX.
 ```
-python R421A08.py COM3 1 --relay * --on -v
+python R421A08.py COM1 1 --relay * --on -v
 Turn relay(s) [1, 2, 3, 4, 5, 6, 7, 8] on...
 TX 8:  01 06 00 01 01 00 D9 9A
 RX 8:  01 06 00 01 01 00 D9 9A
@@ -199,7 +240,7 @@ RX 8:  01 06 00 07 01 00 39 9B
 TX 8:  01 06 00 08 01 00 09 98
 RX 8:  01 06 00 08 01 00 09 98
 
-python R421A08.py COM3 1 --relay * --off -v
+python R421A08.py COM1 1 --relay * --off -v
 Turn relay(s) [1, 2, 3, 4, 5, 6, 7, 8] off...
 TX 8:  01 06 00 01 02 00 D9 6A
 RX 8:  01 06 00 01 02 00 D9 6A
@@ -218,27 +259,27 @@ RX 8:  01 06 00 07 02 00 39 6B
 TX 8:  01 06 00 08 02 00 09 68
 RX 8:  01 06 00 08 02 00 09 68
 
-python R421A08.py COM3 1 --relay 1 --toggle -v
+python R421A08.py COM1 1 --relay 1 --toggle -v
 Toggle relay(s) [1]...
 TX 8:  01 06 00 01 03 00 D8 FA
 RX 8:  01 06 00 01 03 00 D8 FA
 
-python R421A08.py COM3 1 --relay 1 --latch -v
+python R421A08.py COM1 1 --relay 1 --latch -v
 Latch relay(s) [1]...
 TX 8:  01 06 00 01 04 00 DA CA
 RX 8:  01 06 00 01 04 00 DA CA
 
-python R421A08.py COM3 1 --relay 1 --momentary -v
+python R421A08.py COM1 1 --relay 1 --momentary -v
 Turn relay(s) [1] on/off...
 TX 8:  01 06 00 01 05 00 DB 5A
 RX 8:  01 06 00 01 05 00 DB 5A
 
-python R421A08.py COM3 1 --relay 1 --delay 3 -v
+python R421A08.py COM1 1 --relay 1 --delay 3 -v
 Turn relay(s) [1] on/off with delay 3 sec...
 TX 8:  01 06 00 01 06 03 9B AB
 RX 8:  01 06 00 01 06 03 9B AB
 
-python R421A08.py COM3 1 --relay * --status -v
+python R421A08.py COM1 1 --relay * --status -v
 TX 8:  01 03 00 01 00 01 D5 CA
 RX 7:  01 03 02 00 01 79 84
 Relay 1: ON

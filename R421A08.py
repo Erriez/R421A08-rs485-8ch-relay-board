@@ -170,7 +170,12 @@ def modbus_receive(ser, rx_length, verbose=False):
     # Read response with timeout
     rx_data = None
     try:
-        rx_data = ser.read(rx_length)
+        if rx_length:
+            rx_data = ser.read(rx_length)
+        else:
+            # Wait for response without known receive length
+            time.sleep(0.050)
+            rx_data = ser.read_all()
     except serial.SerialException:
         print('RX error: Serial read failed')
 
@@ -189,7 +194,7 @@ def modbus_receive(ser, rx_length, verbose=False):
             print_frame('RX', rx_data)
 
         # Check response: TX data must be the same as RX data
-        if len(rx_data) != rx_length:
+        if rx_length and len(rx_data) != rx_length:
             print('RX error: Incorrect receive length {} Bytes, expected {} Bytes.'.format(
                 len(rx_data),
                 rx_length))
@@ -315,6 +320,49 @@ def check_relay_numbers(relays):
         sys.exit(1)
 
 
+def modbus_send_str(ser, tx_str, add_crc_to_frame=True):
+    """
+        Send raw ASCII hex string
+    :param ser: Serial
+    :param tx_str: Transmit string
+    :param add_crc_to_frame:
+        True: Append CRC to frame
+        False: Do not append CRC
+    :return:
+        List receive Bytes
+        None: Failure
+    """
+    try:
+        # Replace characters, for example:
+        #   ':010600010100D99A' -> '010600010100D99A'
+        #   '0x01, 0x06, 0x00, 0x01, 0x01, 0x00, 0xD9, 0x9A' -> '01 06 00 01 01 00 D9 9A'
+        for c in ['0x', ':', ',', ' ']:
+            tx_str = tx_str.replace(c, '')
+
+        # Insert space every 2 characters, for example:
+        #   '010600010100D99A' -> '01 06 00 01 01 00 D9 9A'
+        tx_str = ' '.join(a + b for a, b in zip(tx_str[::2], tx_str[1::2]))
+
+        # Split data in ints, for example:
+        #   [0x01, 0x06, 0x00, 0x01, 0x01, 0x00, 0xD9, 0x9A]
+        tx_data = [int(i, 16) for i in tx_str.split(' ')]
+    except ValueError:
+        print('Incorrect send argument. Expecting --send formats like:')
+        print('  ":010600010100"')
+        print('  "01 06 00 01 01 00"')
+        print('  "0x01, 0x06, 0x00, 0x01, 0x01, 0x00"')
+        print('Note: CRC bytes can be omitted.')
+        return
+
+    # Add CRC only when not equal to last two Bytes of the transmit frame
+    if add_crc_to_frame:
+        tx_data += modbus_crc(tx_data)
+
+    # Transmit and receive frame
+    modbus_send(ser, tx_data, verbose=True)
+    return modbus_receive(ser, 0, verbose=True)
+
+
 def main():
     """
         Main function, including argument parser
@@ -324,7 +372,7 @@ def main():
     # Argument parser
     _parser = argparse.ArgumentParser(description='8 Channel RS485 RTU relay board type R421A08')
     _parser.add_argument('SERIAL_PORT',
-                         help='Serial port (such as COM1)')
+                         help='Serial port (such as COM1 or /dev/ttyUSB0)')
     _parser.add_argument('ADDRESS',
                          type=int,
                          help='Slave address [0..63]')
@@ -359,6 +407,15 @@ def main():
     _parser.add_argument('-d', '--delay',
                          type=int,
                          help='Delay (0..255 seconds)')
+    _parser.add_argument('--send',
+                         type=str,
+                         metavar='FRAME',
+                         help='Transmit MODBUS frame in ASCII hex, such as ":010600010100" or '
+                              '"01 06 00 01 01 00" or "0x01, 0x06, 0x00, 0x01, 0x01, 0x00". CRC is '
+                              'automatically added to the end of the frame.')
+    _parser.add_argument('-n', '--no-crc',
+                         action='store_true',
+                         help='Do not add CRC to --send frame')
     args = _parser.parse_args()
 
     # Get arguments
@@ -422,9 +479,18 @@ def main():
             cmd = CMD_DELAY
             delay = args.delay
             print('Turn relay(s) {} on/off with delay {} sec...'.format(relays, delay))
+        elif args.send:
+            add_crc_to_frame = True
+            if args.no_crc:
+                add_crc_to_frame = False
+            retval = modbus_send_str(ser, args.send, add_crc_to_frame)
+            if len(retval):
+                sys.exit(0)
+            else:
+                sys.exit(1)
         else:
             print('Error: No command option specified')
-            sys.exit(0)
+            sys.exit(1)
 
     # Send command
     if cmd == CMD_READ_STATUS:
