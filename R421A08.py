@@ -370,12 +370,10 @@ def main():
     """
 
     # Argument parser
-    _parser = argparse.ArgumentParser(description='8 Channel RS485 RTU relay board type R421A08')
+    _parser = argparse.ArgumentParser(description='Python script to control a 8 Channel RS485 '
+                                                  'MODBUS RTU relay board type R421A08.')
     _parser.add_argument('SERIAL_PORT',
                          help='Serial port (such as COM1 or /dev/ttyUSB0)')
-    _parser.add_argument('ADDRESS',
-                         type=int,
-                         help='Slave address [0..63]')
 
     _parser.add_argument('-v', '--verbose',
                          action='store_true',
@@ -383,6 +381,9 @@ def main():
     _parser.add_argument('-i', '--listen',
                          action='store_true',
                          help='Listen on receive')
+    _parser.add_argument('-a', '--address',
+                         type=int,
+                         help='Address of the board [0..63] (Set DIP switches)')
     _parser.add_argument('-r', '--relay',
                          nargs='*',
                          help='Relay numbers [1..8] or * for all relays')
@@ -420,7 +421,7 @@ def main():
 
     # Get arguments
     serial_port = args.SERIAL_PORT
-    address = args.ADDRESS
+    address = args.address
     relays = None
     if args.relay:
         if args.relay == ['*']:
@@ -514,6 +515,8 @@ def main():
                                cmd=cmd,
                                delay=delay,
                                verbose=verbose)
+
+    print('Done')
 
 
 if __name__ == '__main__':
