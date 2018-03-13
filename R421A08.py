@@ -33,9 +33,23 @@
 #
 
 import argparse
-import serial
 import sys
 import time
+
+try:
+    import serial
+except ImportError:
+    print('Error: Cannot import serial. To install pyserial, type:')
+    if sys.platform == 'linux' or sys.platform == 'linux2':
+        if sys.version_info[0] >= 3:
+            python_exe = 'python3'
+        else:
+            python_exe = 'python'
+        print('sudo apt-get install python3-pip')
+        print('sudo {} -m pip install pyserial'.format(python_exe))
+    else:
+        print('python.exe -m pip install pyserial')
+    exit(1)
 
 # Fixed number of relays on the R421A08 board
 NUM_RELAYS = 8
