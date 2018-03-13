@@ -2,7 +2,7 @@
 
 This Python example can control up to 64 individual 8 channel relay boards from the command line by 
 using a USB - RS485 dongle. It has been tested with board type R421A08 with Python 2 and 3 on 
-Windows, but should work on Linux as well.
+Windows and Linux.
 
 ## Hardware
 
