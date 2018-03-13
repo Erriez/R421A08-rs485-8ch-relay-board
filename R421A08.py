@@ -512,6 +512,9 @@ def argument_parser():
     _parser.add_argument('-s', '--status',
                          action='store_true',
                          help='Read status')
+    _parser.add_argument('-p', '--poll',
+                         action='store_true',
+                         help='Poll status every second')
     _parser.add_argument('-1', '--on',
                          action='store_true',
                          help='On')
@@ -584,6 +587,10 @@ def main():
     else:
         if args.status:
             read_status_multiple_relays(ser, args)
+        elif args.poll:
+            while 1:
+                read_status_multiple_relays(ser, args)
+                time.sleep(1)
         elif args.on:
             if len(relays) == 1:
                 print('Turn relay {} on...'.format(relays[0]))
