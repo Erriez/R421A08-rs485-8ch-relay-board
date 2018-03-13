@@ -51,18 +51,21 @@ Support for Python 2 and 3 with PySerial module.
 
 ## Installation PySerial Windows
 ```bash
-cd c:\Python36
 python.exe -m pip install pyserial
 ```
 
 ## Installation PySerial Linux
 ```bash
+$ sudo apt-get install python3-pip
+
+$ sudo python2 -m pip install pyserial
+or:
 $ sudo python3 -m pip install pyserial
 ```
 
 ## Usage
 ```
-c:\Python36\python.exe R421A08.py -h
+python R421A08.py -h
 usage: R421A08.py [-h] [-v] [-i] [-a ADDRESS] [-r [RELAY [RELAY ...]]] [-s]
                   [-1] [-0] [-t] [-l] [-m] [-d DELAY] [--send FRAME] [-n]
                   SERIAL_PORT
@@ -93,7 +96,7 @@ optional arguments:
                         ":010600010100" or "01 06 00 01 01 00" or "0x01, 0x06,
                         0x00, 0x01, 0x01, 0x00". CRC is automatically added to
                         the end of the frame.
-  -n, --no-crc          Do not add CRC to --send frame
+  -n, --no-crc          Do not add CRC to --send FRAME
 ```
 
 ### Board address 1, turn relay 1 on
@@ -102,21 +105,21 @@ Replace the relay number between 1 and 8.
 Abbreviation arguments are supported: replace ```--relay``` with ```-r```. 
 ```
 python R421A08.py COM1 --address 1 --relay 1 --on
-Turn relay(s) [1] on...
+Turn relay 1 on...
 Done
 ```
 
 ### Board address 1, turn all relays on
 ```
 python R421A08.py COM1 --address 1 --relay * --on
-Turn relay(s) [1, 2, 3, 4, 5, 6, 7, 8] on...
+Turn relays 1, 2, 3, 4, 5, 6, 7, 8 on...
 Done
 ```
 
 ### Board address 1, turn relay 1 off
 ```
 python R421A08.py COM1 --address 1 --relay 1 --off
-Turn relay(s) [1] off...
+Turn relay 1 off...
 Done
 ```
 
@@ -124,7 +127,7 @@ Done
 Toggle relay: on -> off and off -> on.
 ```
 python R421A08.py COM1 --address 1 --relay 1 --toggle
-Toggle relay(s) [1]...
+Toggle relay 1...
 Done
 ```
 
@@ -132,7 +135,7 @@ Done
 Turn all relays off, except one.
 ```
 python R421A08.py COM1 --address 1 --relay 1 --latch
-Latch relay(s) [1]...
+Latch relay 1...
 Done
 ```
 
@@ -140,7 +143,7 @@ Done
 Turn relay on for 1 second, then turn it off.
 ```
 python R421A08.py COM1 --address 1 --relay 1 --momentary
-Turn relay(s) [1] on/off...
+Turn relay 1 on/off with 1 sec delay...
 Done
 ```
 
@@ -148,7 +151,7 @@ Done
 Turn relay on for a specific delay in seconds, then turn it off.
 ```
 python R421A08.py COM1 --address 1 --relay 1 --delay 3
-Turn relay(s) [1] on/off with delay 3 sec...
+Turn relay 1 on/off with 3 sec delay...
 Done
 ```
 
@@ -244,7 +247,7 @@ Done
 For debug purposes, print transmit and receive frames in HEX.
 ```
 python R421A08.py COM1 --address 1 --relay * --on -v
-Turn relay(s) [1, 2, 3, 4, 5, 6, 7, 8] on...
+Turn relays 1, 2, 3, 4, 5, 6, 7, 8 on...
 TX 8:  01 06 00 01 01 00 D9 9A
 RX 8:  01 06 00 01 01 00 D9 9A
 TX 8:  01 06 00 02 01 00 29 9A
@@ -264,7 +267,7 @@ RX 8:  01 06 00 08 01 00 09 98
 Done
 
 python R421A08.py COM1 --address 1 --relay * --off -v
-Turn relay(s) [1, 2, 3, 4, 5, 6, 7, 8] off...
+Turn relays 1, 2, 3, 4, 5, 6, 7, 8 off...
 TX 8:  01 06 00 01 02 00 D9 6A
 RX 8:  01 06 00 01 02 00 D9 6A
 TX 8:  01 06 00 02 02 00 29 6A
@@ -284,25 +287,25 @@ RX 8:  01 06 00 08 02 00 09 68
 Done
 
 python R421A08.py COM1 --address 1 --relay 1 --toggle -v
-Toggle relay(s) [1]...
+Toggle relay 1...
 TX 8:  01 06 00 01 03 00 D8 FA
 RX 8:  01 06 00 01 03 00 D8 FA
 Done
 
 python R421A08.py COM1 --address 1 --relay 1 --latch -v
-Latch relay(s) [1]...
+Latch relay 1...
 TX 8:  01 06 00 01 04 00 DA CA
 RX 8:  01 06 00 01 04 00 DA CA
 Done
 
 python R421A08.py COM1 --address 1 --relay 1 --momentary -v
-Turn relay(s) [1] on/off...
+Turn relay 1 on/off with 1 sec delay...
 TX 8:  01 06 00 01 05 00 DB 5A
 RX 8:  01 06 00 01 05 00 DB 5A
 Done
 
 python R421A08.py COM1 --address 1 --relay 1 --delay 3 -v
-Turn relay(s) [1] on/off with delay 3 sec...
+Turn relay 1 on/off with 3 sec delay...
 TX 8:  01 06 00 01 06 03 9B AB
 RX 8:  01 06 00 01 06 03 9B AB
 Done

@@ -53,6 +53,7 @@ except ImportError:
 
 # Fixed number of relays on the R421A08 board
 NUM_RELAYS = 8
+NUM_ADDRESSES = 64
 
 # Commands
 CMD_ON = 0x01
@@ -61,7 +62,6 @@ CMD_TOGGLE = 0x03
 CMD_LATCH = 0x04
 CMD_MOMENTARY = 0x05
 CMD_DELAY = 0x06
-CMD_READ_STATUS = 0x07
 
 # According to MODBUS specification:
 # Wait at least 3.5 char between frames
@@ -319,21 +319,6 @@ def read_relay_status(ser, address, relay, verbose=False):
     return -1
 
 
-def check_relay_numbers(relays):
-    """
-        Check for valid relay numbers. Exit when errors found.
-    :param relays: List relay numbers (int)
-    :return: None
-    """
-    errors = False
-    for relay in relays:
-        if relay < 1 or relay > NUM_RELAYS:
-            errors = True
-            print('Incorrect relay number: {}'.format(relay))
-    if errors:
-        sys.exit(1)
-
-
 def modbus_send_str(ser, tx_str, add_crc_to_frame=True):
     """
         Send raw ASCII hex string
@@ -377,30 +362,153 @@ def modbus_send_str(ser, tx_str, add_crc_to_frame=True):
     return modbus_receive(ser, 0, verbose=True)
 
 
-def main():
+def get_relay_numbers(args):
     """
-        Main function, including argument parser
+        Check for valid relay numbers. Exit when errors found.
+    :param args: Argument parser
+    :return: List relays (int)
+    """
+    relays = []
+
+    if args.relay:
+        if args.relay == ['*']:
+            # Convert * to relay int numbers
+            relays = [relay for relay in range(1, NUM_RELAYS + 1)]
+        else:
+            # Convert relay arguments to int
+            relays = list(map(int, args.relay))
+
+        # Check relay numbers
+        errors = False
+        for relay in relays:
+            if relay < 1 or relay > NUM_RELAYS:
+                errors = True
+                print('Incorrect relay number: {}'.format(relay))
+        if errors:
+            sys.exit(1)
+
+    return relays
+
+
+def read_status_multiple_relays(ser, args):
+    """
+        Read status of multiple relays
+    :param ser: Serial
+    :param args: Arguments
     :return: None
     """
+    for relay in get_relay_numbers(args):
+        status = read_relay_status(ser,
+                                   address=args.address,
+                                   relay=relay,
+                                   verbose=args.verbose)
+        if status == 1:
+            status_str = 'ON'
+        elif status == 0:
+            status_str = 'OFF'
+        else:
+            status_str = 'UNKNOWN'
+        print('Relay {}: {}'.format(relay, status_str))
 
-    # Argument parser
+
+def send_command_multiple_relays(ser, address, relays, cmd, delay=0, verbose=False):
+    """
+        Send command to multiple relays
+    :param ser:
+    :param address:
+    :param relays:
+    :param cmd:
+    :param delay:
+    :param verbose:
+    :return:
+    """
+    for relay in relays:
+        send_relay_command(ser,
+                           address=address,
+                           relay=relay,
+                           cmd=cmd,
+                           delay=delay,
+                           verbose=verbose)
+
+
+def relay_types(relay):
+    """
+        Check relay type argument
+    :param relay: One relay
+    :return: Relay argument
+    """
+    errors = False
+
+    if relay == '*':
+        pass
+    else:
+        try:
+            relay = int(relay)
+            if relay < 1 or relay > NUM_RELAYS:
+                errors = True
+        except ValueError:
+            errors = True
+
+    if errors:
+        raise argparse.ArgumentTypeError("Valid relay numbers: 1..{}".format(NUM_RELAYS))
+
+    return relay
+
+
+def address_type(address):
+    """
+        Check address type argument
+    :param address: Address
+    :return: Address argument
+    """
+    errors = False
+
+    try:
+        address = int(address)
+    except ValueError:
+        errors = True
+
+    if address >= NUM_ADDRESSES:
+        errors = True
+
+    if errors:
+        raise argparse.ArgumentTypeError("Valid addresses: 0..{}".format(NUM_ADDRESSES - 1))
+
+    return address
+
+
+def argument_parser():
+    """
+        Argument parser
+    :return: Return value of _parser.parse_args()
+    """
+
+    # Create argument parser
     _parser = argparse.ArgumentParser(description='Python script to control a 8 Channel RS485 '
                                                   'MODBUS RTU relay board type R421A08.')
+
+    # Serial port argument is always required
     _parser.add_argument('SERIAL_PORT',
                          help='Serial port (such as COM1 or /dev/ttyUSB0)')
 
+    # Global optional arguments
     _parser.add_argument('-v', '--verbose',
                          action='store_true',
                          help='Print verbose')
+
+    # Read/write options
     _parser.add_argument('-i', '--listen',
                          action='store_true',
                          help='Listen on receive')
     _parser.add_argument('-a', '--address',
-                         type=int,
+                         type=address_type,
                          help='Address of the board [0..63] (Set DIP switches)')
     _parser.add_argument('-r', '--relay',
                          nargs='*',
+                         type=relay_types,
                          help='Relay numbers [1..8] or * for all relays')
+
+    # Relay commands
     _parser.add_argument('-s', '--status',
                          action='store_true',
                          help='Read status')
@@ -422,6 +530,8 @@ def main():
     _parser.add_argument('-d', '--delay',
                          type=int,
                          help='Delay (0..255 seconds)')
+
+    # Raw MODBUS send command
     _parser.add_argument('--send',
                          type=str,
                          metavar='FRAME',
@@ -430,27 +540,23 @@ def main():
                               'automatically added to the end of the frame.')
     _parser.add_argument('-n', '--no-crc',
                          action='store_true',
-                         help='Do not add CRC to --send frame')
-    args = _parser.parse_args()
+                         help='Do not add CRC to --send FRAME')
 
-    # Get arguments
-    serial_port = args.SERIAL_PORT
-    address = args.address
-    relays = None
-    if args.relay:
-        if args.relay == ['*']:
-            # Convert * to relay int numbers
-            relays = [relay for relay in range(1, NUM_RELAYS + 1)]
-        else:
-            # Convert relay arguments to int
-            relays = list(map(int, args.relay))
-        check_relay_numbers(relays)
-    delay = 0
-    verbose = args.verbose
+    # Start argument parser
+    return _parser.parse_args()
+
+
+def main():
+    """
+        Main function, including argument parser
+    :return: None
+    """
+
+    args = argument_parser()
 
     # Create serial
     ser = serial.Serial()
-    ser.port = serial_port
+    ser.port = args.SERIAL_PORT
     ser.baudrate = 9600
     ser.bytesize = 8
     ser.stopbits = 1
@@ -464,71 +570,100 @@ def main():
         print('Error: Cannot open serial port: ' + ser.port)
         sys.exit(1)
 
-    cmd = None
+    # Get relay numbers
+    relays = get_relay_numbers(args)
+
+    # Parse commands
     if args.listen:
-        if address == 0:
+        if args.address == 0:
             print('Listening for all incoming frames.')
         else:
-            print('Listening for incoming frames from address {}.'.format(address))
+            print('Listening for incoming frames from address {}.'.format(args.address))
         print('Press CTRL+C to abort.')
-        modbus_listen(ser, address)
+        modbus_listen(ser, args.address)
     else:
         if args.status:
-            cmd = CMD_READ_STATUS
+            read_status_multiple_relays(ser, args)
         elif args.on:
-            cmd = CMD_ON
-            print('Turn relay(s) {} on...'.format(relays))
+            if len(relays) == 1:
+                print('Turn relay {} on...'.format(relays[0]))
+            else:
+                print('Turn relays {} on...'.format(', '.join(str(relay) for relay in relays)))
+
+            send_command_multiple_relays(ser,
+                                         address=args.address,
+                                         relays=get_relay_numbers(args),
+                                         cmd=CMD_ON,
+                                         verbose=args.verbose)
         elif args.off:
-            cmd = CMD_OFF
-            print('Turn relay(s) {} off...'.format(relays))
+            if len(relays) == 1:
+                print('Turn relay {} off...'.format(relays[0]))
+            else:
+                print('Turn relays {} off...'.format(', '.join(str(relay) for relay in relays)))
+
+            send_command_multiple_relays(ser,
+                                         address=args.address,
+                                         relays=get_relay_numbers(args),
+                                         cmd=CMD_OFF,
+                                         verbose=args.verbose)
         elif args.toggle:
-            cmd = CMD_TOGGLE
-            print('Toggle relay(s) {}...'.format(relays))
+            if len(relays) == 1:
+                print('Toggle relay {}...'.format(relays[0]))
+            else:
+                print('Toggle relays {}...'.format(', '.join(str(relay) for relay in relays)))
+
+            send_command_multiple_relays(ser,
+                                         address=args.address,
+                                         relays=get_relay_numbers(args),
+                                         cmd=CMD_TOGGLE,
+                                         verbose=args.verbose)
         elif args.latch:
-            cmd = CMD_LATCH
-            print('Latch relay(s) {}...'.format(relays))
+            if len(relays) == 1:
+                print('Latch relay {}...'.format(relays[0]))
+            else:
+                print('Latch relays {}...'.format(', '.join(str(relay) for relay in relays)))
+
+            send_command_multiple_relays(ser,
+                                         address=args.address,
+                                         relays=get_relay_numbers(args),
+                                         cmd=CMD_LATCH,
+                                         verbose=args.verbose)
         elif args.momentary:
-            cmd = CMD_MOMENTARY
-            print('Turn relay(s) {} on/off...'.format(relays))
+            if len(relays) == 1:
+                print('Turn relay {} on/off with 1 sec delay...'.format(relays[0]))
+            else:
+                print('Turn relays {} on/off with 1 sec delay...'.format(
+                    ', '.join(str(relay) for relay in relays)))
+
+            send_command_multiple_relays(ser,
+                                         address=args.address,
+                                         relays=get_relay_numbers(args),
+                                         cmd=CMD_MOMENTARY,
+                                         verbose=args.verbose)
         elif args.delay:
-            cmd = CMD_DELAY
-            delay = args.delay
-            print('Turn relay(s) {} on/off with delay {} sec...'.format(relays, delay))
+            if len(relays) == 1:
+                print('Turn relay {} on/off with {} sec delay...'.format(relays[0], args.delay))
+            else:
+                print('Turn relays {} on/off with {} sec delay...'.format(
+                    ', '.join(str(relay) for relay in relays), args.delay))
+
+            send_command_multiple_relays(ser,
+                                         address=args.address,
+                                         relays=get_relay_numbers(args),
+                                         cmd=CMD_DELAY,
+                                         delay=args.delay,
+                                         verbose=args.verbose)
         elif args.send:
             add_crc_to_frame = True
             if args.no_crc:
                 add_crc_to_frame = False
-            retval = modbus_send_str(ser, args.send, add_crc_to_frame)
-            if len(retval):
-                sys.exit(0)
+            if modbus_send_str(ser, args.send, add_crc_to_frame):
+                exit(0)
             else:
-                sys.exit(1)
+                exit(1)
         else:
             print('Error: No command option specified')
             sys.exit(1)
-
-    # Send command
-    if cmd == CMD_READ_STATUS:
-        for relay in list(relays):
-            status = read_relay_status(ser,
-                                       address=address,
-                                       relay=relay,
-                                       verbose=verbose)
-            if status == 1:
-                status_str = 'ON'
-            elif status == 0:
-                status_str = 'OFF'
-            else:
-                status_str = 'UNKNOWN'
-            print('Relay {}: {}'.format(relay, status_str))
-    else:
-        for relay in list(relays):
-            send_relay_command(ser,
-                               address=address,
-                               relay=relay,
-                               cmd=cmd,
-                               delay=delay,
-                               verbose=verbose)
 
     print('Done')
 
