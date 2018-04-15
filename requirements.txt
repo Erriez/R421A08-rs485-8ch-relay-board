@@ -1,0 +1,6 @@
+coverage==4.5.1
+cx-Freeze==5.1.1
+future==0.16.0
+PyInstaller==3.3.1
+pyserial==3.4
+wxPython==4.0.1

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=R421A08 Relay Control
+Icon=relay
+Exec=usr/bin/relay_gui
+Type=Application
+Categories=Utility;
+X-AppImage-Version=v1.0.0

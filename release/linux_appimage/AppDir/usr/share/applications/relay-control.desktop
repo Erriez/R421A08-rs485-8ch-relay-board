@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=R421A08 Relay Control
+Icon=relay.ico
+Exec=relay_gui
+Type=Application
+Terminal=false
+Categories=System;
+Name[en_US]=R421A08 Relay Control

@@ -1,102 +1,182 @@
 # 8 Channel RS485 MODBUS RTU relay board type R421A08
 
-This Python example can control up to 64 individual 8 channel relay boards from the command line by 
-using a USB - RS485 dongle. It has been tested with board type R421A08 with Python 2 and 3 on 
-Windows and Linux.
+This Python project can control up to 64 individual 8 channel R421A08 relay boards from the command line and GUI. It uses a universal USB - RS485 dongle.
+
+### Project features:
+
+* Python packages for easy application integration.
+* Simple command line interface, useful for scripting.
+* Python packages tested with Python 2.7 and 3.6.
+* wxPython GUI tested with Python 3.5 only (Windows 10 and Ubuntu 16.04)
+* Unit tests with coverage.
+
+
 
 ## Hardware
 
 The following hardware is required for this project:
 
+* One or more R421A08 relay boards.
+* RS485 - USB dongle.
+* Optional: A second RS485 - USB dongle to monitor MODBUS frames.
+
 ### R421A08 relay board
 
 ![R421A08 board](https://raw.githubusercontent.com/Erriez/R421A08-rs485-8ch-relay-board/master/images/R421A08.png)
 
-* Board power: 12V DC 
-* Current board idle: ~11mA
-* Current one relay: ~26mA
-* Current all relays on: ~220mA
+* RS485 (binary) interface.
+* 8 x 12V Relays: 10A 125VAC / 10A 28VDC.
+* 8 status LED's.
+* 6 DIP switches for 64 board addresses.
+* Board power: 12V DC.
+* Current board idle: ~11mA.
+* Current one relay: ~26mA.
+* Current all relays on: ~220mA.
+* Length: 90mm, width: 60mm, height: 20mm.
 
 **WARNING: DO NOT USE THIS RELAY BOARD WITH 230V AC!**  
 The distance between relay traces on the PCB are < 2mm without holes for isolation. This is dangerous when using it with high voltages. See the picture above.
 
 ### RS485 - USB dongle
 
-This project requires a USB to RS485 dongle, for example:
+This project requires a RS485 - USB dongle which is widely available, for example:
 
 ![RS485 - USB dongle](https://raw.githubusercontent.com/Erriez/R421A08-rs485-8ch-relay-board/master/images/RS485_USB_dongle.png)
 
 * On Windows, open the ```Device Manager``` | ```Ports (COM & LPT)``` to find the ```USB-SERIAL CH340 (COMxx)``` serial port.
 * On Linux, use the ```dmesg``` command  to find the serial port, such as ```/dev/ttyUSB0```.
 
-## RS485 RTU MODBUS communication protocol
 
-[MODBUS](https://en.wikipedia.org/wiki/Modbus) is an open binary serial communication protocol, mainly used for PLCs.
+## Software
 
-* Serial port at 9600 baud, 8 databits, 1 stop, no parity.
-* This board supports MODBUS RTU protocol only.
-* This board supports 64 addresses, configurable with 6 DIP switches. 
-* This board does **not** support ASCII mode, but can be send with the Python```--send``` option.
-* This board does **not** support AT commands.
-* This board does **not** support broadcasts.
-* All relays are off after power-on.
+### Screenshot R421A08 relay GUI
 
-## Source
-Support for Python 2 and 3 with PySerial module.
+![Screenshot R421A08 Relay Control GUI](https://raw.githubusercontent.com/Erriez/R421A08-rs485-8ch-relay-board/master/images/screenshot_R421A08_relay_control_gui.png)
 
-[Source R421A08.py](https://github.com/Erriez/R421A08-rs485-8ch-relay-board/blob/master/R421A08.py)
+### Screenshot MODBUS GUI
 
-## Documentation
-[MODBUS Application Protocol Specification v1.1.b](http://www.modbus.org/docs/Modbus_Application_Protocol_V1_1b.pdf)
+![Screenshot MODBUS GUI](https://raw.githubusercontent.com/Erriez/R421A08-rs485-8ch-relay-board/master/images/screenshot_modbus_gui.png)
 
-## Installation PySerial Windows
+### Screenshot commandline
+
+![Screenshot MODBUS GUI](https://raw.githubusercontent.com/Erriez/R421A08-rs485-8ch-relay-board/master/images/screenshot_commandline.png)
+
+## Installation 
+
+Installation PySerial Windows:
+
 ```bash
 python.exe -m pip install pyserial
+python -m pip install -U --force-reinstall pip
 ```
 
-## Installation PySerial Linux
+Installation PySerial Linux:
 ```bash
+# For Python2:
+$ sudo python -m pip install pyserial
+
+# For Python3:
 $ sudo apt-get install python3-pip
-
-$ sudo python2 -m pip install pyserial
-or:
-$ sudo python3 -m pip install pyserial
+$ sudo pip3 install pyserial
 ```
 
-## Usage
+
+
+## Usage ```relay_boards``` package
+
+[getting_started.py](https://raw.githubusercontent.com/Erriez/R421A08-rs485-8ch-relay-board/master/examples/getting_started.py)
+
+```python
+import time
+import relay_boards
+
+def check(retval):
+    if not retval:
+        exit(1)
+
+if __name__ == '__main__':
+    print('Getting started R421A08 relay board\n')
+
+    # Create relay board object
+    board = relay_boards.R421A08(serial_port='COM3', address=1)
+
+    print('Status all relays:')
+    check(board.print_status_all())
+    time.sleep(1)
+
+    print('Turn relay 1 on')
+    check(board.on(1))
+    time.sleep(1)
+
+    print('Turn relay 1 off')
+    check(board.off(1))
+    time.sleep(1)
+
+    print('Toggle relay 8')
+    check(board.toggle(8))
+    time.sleep(1)
+
+    print('Latch relays 6 on, all other relays off')
+    check(board.latch(6))
+    time.sleep(1)
+
+    print('Turn relay 4 on for 5 seconds, all other relays off')
+    check(board.delay(4, delay=5))
+    time.sleep(6)
+
+    print('Turn relays 3, 7 and 8 on')
+    check(board.toggle_multi([3, 7, 8]))
+    time.sleep(1)
+
+    print('Turn all relays on')
+    check(board.on_all())
+    time.sleep(1)
+
+    print('Turn all relays off')
+    check(board.off_all())
+    time.sleep(1)
 ```
-python R421A08.py -h
-usage: R421A08.py [-h] [-v] [-i] [-a ADDRESS] [-r [RELAY [RELAY ...]]] [-s]
-                  [-1] [-0] [-t] [-l] [-m] [-d DELAY] [--send FRAME] [-n]
-                  SERIAL_PORT
+
+
+
+## Usage command line
+
+```shell
+set PATH=%PATH%;C:\Python36
+set PYTHONPATH=%PYTHONPATH%;.
+echo %PYTHONPATH%
+
+.\relay_cmdline.py
+examples\getting_started.py
+```
+
+
+
+The relay board can be controlled from the command line:
+
+```
+usage: relay_cmdline.py [-h]
+                        <SERIAL_PORT> <ADDRESS>
+                        {status,on,off,toggle,latch,momentary,delay} ...
 
 Python script to control a 8 Channel RS485 MODBUS RTU relay board type
 R421A08.
 
 positional arguments:
-  SERIAL_PORT           Serial port (such as COM1 or /dev/ttyUSB0)
+  <SERIAL_PORT>         Serial port (such as COM1 or /dev/ttyUSB0)
+  <ADDRESS>             Address of the board [0..63] (Set DIP switches)
+  {status,on,off,toggle,latch,momentary,delay}
+                        Relay command
+    status              Read status
+    on                  On
+    off                 Off
+    toggle              Toggle
+    latch               Latch
+    momentary           Momentary
+    delay               Delay
 
 optional arguments:
   -h, --help            show this help message and exit
-  -v, --verbose         Print verbose
-  -i, --listen          Listen on receive
-  -a ADDRESS, --address ADDRESS
-                        Address of the board [0..63] (Set DIP switches)
-  -r [RELAY [RELAY ...]], --relay [RELAY [RELAY ...]]
-                        Relay numbers [1..8] or * for all relays
-  -s, --status          Read status
-  -1, --on              On
-  -0, --off             Off
-  -t, --toggle          Toggle
-  -l, --latch           Latch
-  -m, --momentary       Momentary
-  -d DELAY, --delay DELAY
-                        Delay (0..255 seconds)
-  --send FRAME          Transmit MODBUS frame in ASCII hex, such as
-                        ":010600010100" or "01 06 00 01 01 00" or "0x01, 0x06,
-                        0x00, 0x01, 0x01, 0x00". CRC is automatically added to
-                        the end of the frame.
-  -n, --no-crc          Do not add CRC to --send FRAME
 ```
 
 ### Board address 1, turn relay 1 on
@@ -336,4 +416,41 @@ TX 8:  01 03 00 08 00 01 05 C8
 RX 7:  01 03 02 00 00 B8 44
 Relay 8: OFF
 Done
+```
+
+## Documentation
+
+[MODBUS Application Protocol Specification v1.1.b](http://www.modbus.org/docs/Modbus_Application_Protocol_V1_1b.pdf)
+
+The following Python packages are available in this project:
+
+- R421A08 relay board Python package:
+  - Read state relay(s).
+  - Turn relay(s) on.
+  - Turn relay(s) off.
+  - Toggle relay(s).
+  - Latch relay (One relay on, rest off).
+  - Momentary (Turn relay on for one second).
+  - Delay (Turn relay on for 1..255 seconds).
+  - Single or multiple relay boards.
+- Serial MODBUS Python package:
+  - MODBUS monitor frames on the RS485 bus
+  - Send raw ASCII MODBUS frames
+
+### RS485 RTU MODBUS communication protocol
+
+[MODBUS](https://en.wikipedia.org/wiki/Modbus) is an open binary serial communication protocol, mainly used for PLCs.
+
+- Serial port at 9600 baud, 8 databits, 1 stop, no parity.
+- This board supports MODBUS RTU protocol only.
+- This board supports 64 addresses, configurable with 6 DIP switches. 
+- This board does **not** support ASCII mode, but can be send with the Python```--send``` option.
+- This board does **not** support AT commands.
+- This board does **not** support broadcasts.
+- All relays are off after power-on.
+
+## Unit tests
+
+```bash
+python -m unittest tests.test_relay_board
 ```

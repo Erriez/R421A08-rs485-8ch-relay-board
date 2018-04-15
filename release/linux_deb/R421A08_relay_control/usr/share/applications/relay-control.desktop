@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=R421A08 Relay Control
+Icon=/usr/share/R421A08_relay_control/images/relay.ico
+Exec=/usr/share/R421A08_relay_control/relay_gui
+Type=Application
+Categories=Utilities;
+Name[en_US]=R421A08 Relay Control

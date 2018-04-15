@@ -1,0 +1,12 @@
+Package: R421A08-Relay-Board-Control
+Version: 1.0.0
+Section: custom
+Priority: optional
+Architecture: all
+Essential: no
+Installed-Size: 135000
+Maintainer: Erriez
+Homepage: http://www.github.com/Erriez/R421A08-rs485-8ch-relay-board
+Description: R421A08 RS485 8ch relay board
+  This application can control up to 64 individual 8 channel R421A08 relay boards by using a USB - RS485 dongle
+  from the commandline or GUI. Built with wxPython. Source is available on GitHub.
