@@ -23,7 +23,7 @@
 #
 
 ##
-# Simple MODBUS implementation
+# This is a Simple MODBUS implementation
 #
 # Source: https://github.com/Erriez/R421A08-rs485-8ch-relay-board
 #

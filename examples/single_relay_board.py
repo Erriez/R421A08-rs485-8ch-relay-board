@@ -24,10 +24,7 @@
 #
 
 ##
-# This is a Python commandline example to control a single R421A08 relay board with a USB - RS485
-# dongle.
-#
-# Python 2.7 and Python 3.6 are supported.
+# This is a Python example to control a single R421A08 relay board with a USB - RS485 dongle.
 #
 # Source: https://github.com/Erriez/R421A08-rs485-8ch-relay-board
 #

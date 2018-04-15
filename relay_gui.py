@@ -23,6 +23,16 @@
 # SOFTWARE.
 #
 
+##
+# 8 Channel RS485 RTU relay board type R421A08 GUI.
+#
+# This is a wxPython GUI to control multiple R421A08 relay boards  by using a USB - RS485 dongle.
+#
+# Tested with wxPython 4.0.1 and Python 3.5 / 3.6.
+#
+# Source: https://github.com/Erriez/R421A08-rs485-8ch-relay-board
+#
+
 import os
 import sys
 import wx

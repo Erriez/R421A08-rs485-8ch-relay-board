@@ -26,7 +26,6 @@
 # 8 Channel RS485 RTU relay board type R421A08.
 #
 # This is a Python example to control the relay board with a USB - RS485 dongle.
-# Python 2.7 and Python 3.6 are supported.
 #
 # Source: https://github.com/Erriez/R421A08-rs485-8ch-relay-board
 #

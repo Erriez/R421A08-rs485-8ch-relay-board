@@ -22,6 +22,12 @@
 # SOFTWARE.
 #
 
+##
+# This module retrieves all available serial ports
+#
+# Source: https://github.com/Erriez/R421A08-rs485-8ch-relay-board
+#
+
 import glob
 import sys
 import serial

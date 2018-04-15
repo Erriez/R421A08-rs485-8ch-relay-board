@@ -23,6 +23,17 @@
 # SOFTWARE.
 #
 
+##
+# MODBUS GUI.
+#
+# This is a wxPython GUI to monitor and send MODBUS commands by using a USB - RS485
+# dongle.
+#
+# Tested with wxPython 4.0.1 and Python 3.5 / 3.6.
+#
+# Source: https://github.com/Erriez/R421A08-rs485-8ch-relay-board
+#
+
 import sys
 import wx
 
