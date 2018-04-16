@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 PAR=$(dirname "$(readlink -f "$0")")
 exec "$PAR/usr/bin/relay_gui" "$@"
