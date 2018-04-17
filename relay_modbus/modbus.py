@@ -272,7 +272,11 @@ class Modbus(object):
             # Clear receive
             while self._ser.read_all():
                 time.sleep(0.010)
+        except serial.SerialException:
+            # Windows: Serial exception
+            raise TransferException('RX error: Read failed')
         except AttributeError:
+            # Ubuntu: Attribute error (Not documented)
             raise TransferException('RX error: Read failed')
 
         # Write binary command to relay card over serial port
