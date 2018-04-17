@@ -694,7 +694,12 @@ class RelayPanel(wx.Panel):
 
     def OnBtnRelayToggleClick(self, event=None):
         relay = event.GetId()
-        self.send_relay_command('toggle', relay)
+
+        # Another wxPython bug on Ubuntu only:
+        # Disabling a panel does not generate events on Windows which is correct behavior, but does not work on Ubuntu.
+        # For this reason, it is required to check the state is enabled.
+        if self.m_bmpStatus[0].IsEnabled():
+            self.send_relay_command('toggle', relay)
 
     def OnBtnRelayPulse(self, event=None):
         relay = event.GetId()
