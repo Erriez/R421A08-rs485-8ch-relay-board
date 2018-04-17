@@ -268,9 +268,12 @@ class Modbus(object):
         if self._verbose:
             print(get_frame_str('TX', self._tx_data))
 
-        # Clear receive
-        while self._ser.read_all():
-            time.sleep(0.010)
+        try:
+            # Clear receive
+            while self._ser.read_all():
+                time.sleep(0.010)
+        except AttributeError:
+            raise TransferException('RX error: Read failed')
 
         # Write binary command to relay card over serial port
         try:
