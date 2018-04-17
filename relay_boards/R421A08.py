@@ -167,6 +167,9 @@ class R421A08(object):
         assert cmd >= 0 and cmd <= 255
         assert delay >= 0 and delay <= 255
 
+        if not self._modbus.is_open():
+            raise ModbusException('Error: Serial port not open')
+
         # Create binary control command
         tx_data = [
             self._address,              # Slave address of the relay board 0..63
@@ -199,6 +202,9 @@ class R421A08(object):
         """
 
         assert type(relay) == int
+
+        if not self._modbus.is_open():
+            raise ModbusException('Error: Serial port not open')
 
         # Create binary read status
         tx_data = [

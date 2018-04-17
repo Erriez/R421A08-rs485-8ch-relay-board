@@ -458,20 +458,32 @@ class RelayGUI(frmRelays):
             self.m_statusBar.SetStatusText('Cannot remove board.')
 
     def OnAllRelaysOnClick(self, event=None):
-        page = self.m_notebook.GetCurrentPage()
-        page.send_all_relays_command('on_all')
+        if self.m_relay_modbus.is_open():
+            page = self.m_notebook.GetCurrentPage()
+            page.send_all_relays_command('on_all')
+        else:
+            self.m_statusBar.SetStatusText('Error: Serial port disconnected.')
 
     def OnAllRelaysOffClick(self, event=None):
-        page = self.m_notebook.GetCurrentPage()
-        page.send_all_relays_command('off_all')
+        if self.m_relay_modbus.is_open():
+            page = self.m_notebook.GetCurrentPage()
+            page.send_all_relays_command('off_all')
+        else:
+            self.m_statusBar.SetStatusText('Error: Serial port disconnected.')
 
     def OnRelayToggleClick(self, event=None):
-        page = self.m_notebook.GetCurrentPage()
-        page.send_relay_command('toggle', event.GetId())
+        if self.m_relay_modbus.is_open():
+            page = self.m_notebook.GetCurrentPage()
+            page.send_relay_command('toggle', event.GetId())
+        else:
+            self.m_statusBar.SetStatusText('Error: Serial port disconnected.')
 
     def OnRefreshAllRelaysClick(self, event=None):
-        page = self.m_notebook.GetCurrentPage()
-        page.refresh_all_relays()
+        if self.m_relay_modbus.is_open():
+            page = self.m_notebook.GetCurrentPage()
+            page.refresh_all_relays()
+        else:
+            self.m_statusBar.SetStatusText('Error: Serial port disconnected.')
 
     def OnMenuHelp(self, event=None):
         # Open Github main page in new browser tab
@@ -693,13 +705,13 @@ class RelayPanel(wx.Panel):
         self.send_relay_command('off', relay)
 
     def OnBtnRelayToggleClick(self, event=None):
-        relay = event.GetId()
-
         # Another wxPython bug on Ubuntu only:
-        # Disabling a panel does not generate events on Windows which is correct behavior, but does not work on Ubuntu.
+        # Disabling a panel does not generate events on Windows which is correct behavior,
+        # but does not work on Ubuntu.
         # For this reason, it is required to check the state is enabled.
-        if self.m_bmpStatus[0].IsEnabled():
-            self.send_relay_command('toggle', relay)
+        m_bmpStatus = event.GetEventObject()
+        if m_bmpStatus.IsEnabled():
+            self.send_relay_command('toggle', relay=event.GetId())
 
     def OnBtnRelayPulse(self, event=None):
         relay = event.GetId()
