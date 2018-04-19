@@ -32,6 +32,10 @@
 import sys
 import time
 
+# Add system path to find relay_ Python packages
+sys.path.append('.')
+sys.path.append('..')
+
 import relay_modbus
 import relay_boards
 

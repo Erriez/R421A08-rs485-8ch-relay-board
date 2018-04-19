@@ -35,8 +35,13 @@ import sys
 import wx
 import wx.adv
 
+# Add system path to find relay_ Python packages
+sys.path.append('.')
+sys.path.append('..')
+
 import relay_modbus
 import relay_boards
+
 
 # Required: Configure serial port, for example:
 #   On Windows: 'COMx'
@@ -120,7 +125,7 @@ class RelayFrame(wx.Frame):
         # About menu
         m_menuAbout = wx.Menu()
         m_menuItemAbout = wx.MenuItem(m_menuAbout, wx.ID_ANY, u'&About' + u'\t' + u'Shift+?',
-                                     wx.EmptyString, wx.ITEM_NORMAL)
+                                      wx.EmptyString, wx.ITEM_NORMAL)
         m_menuAbout.Append(m_menuItemAbout)
         m_menubar.Append(m_menuAbout, u'&Help')
 
