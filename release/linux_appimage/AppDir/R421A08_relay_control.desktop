@@ -4,4 +4,4 @@ Icon=relay
 Exec=usr/bin/relay_gui
 Type=Application
 Categories=Utility;
-X-AppImage-Version=v1.0.0
+X-AppImage-Version=v1.0.1
