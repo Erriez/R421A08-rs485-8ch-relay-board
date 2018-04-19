@@ -38,7 +38,7 @@ if sys.platform == "win32":
     base = "Win32GUI"
 
 setup(name = "modbus",
-      version = "1.0.0",
+      version = "1.0.1",
       description = "8 Channel RS485 MODBUS RTU relay board type R421A08",
       options = {"build_exe": build_exe_options},
       executables = [

@@ -8,7 +8,7 @@ BASEDIR=$(dirname ${SCRIPTPATH})
 cd ${BASEDIR}
 
 # Export variables to other scripts
-export VERSION="v1.0.0"
+export VERSION="v1.0.1"
 export OUTPUT_DIR=${BASEDIR}/build
 export INPUT_DIR=${BASEDIR}/build/exe.linux-x86_64-3.5
 
