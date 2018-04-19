@@ -14,6 +14,7 @@
         <property name="file">form_relay</property>
         <property name="first_id">1000</property>
         <property name="help_provider">none</property>
+        <property name="indent_with_spaces"></property>
         <property name="internationalize">0</property>
         <property name="name">FormRelayBoards</property>
         <property name="namespace"></property>
@@ -800,6 +801,21 @@
                         <property name="shortcut">F1</property>
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection">OnMenuHelp</event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
+                    <object class="wxMenuItem" expanded="1">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">1</property>
+                        <property name="help"></property>
+                        <property name="id">wxID_ANY</property>
+                        <property name="kind">wxITEM_NORMAL</property>
+                        <property name="label">Source on GitHub</property>
+                        <property name="name">m_menuItemSource</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut"></property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection">OnMenuSourceOnGitHub</event>
                         <event name="OnUpdateUI"></event>
                     </object>
                     <object class="wxMenuItem" expanded="1">

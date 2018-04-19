@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*- 
 
 ###########################################################################
-## Python code generated with wxFormBuilder (version Jan 23 2018)
+## Python code generated with wxFormBuilder (version Apr  8 2018)
 ## http://www.wxformbuilder.org/
 ##
 ## PLEASE DO *NOT* EDIT THIS FILE!
@@ -135,6 +135,9 @@ class frmRelays ( wx.Frame ):
 		self.m_menuItemHelp = wx.MenuItem( self.m_menuHelp, wx.ID_ANY, u"&Help"+ u"\t" + u"F1", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menuHelp.Append( self.m_menuItemHelp )
 		
+		self.m_menuItemSource = wx.MenuItem( self.m_menuHelp, wx.ID_ANY, u"Source on GitHub", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuHelp.Append( self.m_menuItemSource )
+		
 		self.m_menuItemUpdates = wx.MenuItem( self.m_menuHelp, wx.ID_ANY, u"&Check updates...", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menuHelp.Append( self.m_menuItemUpdates )
 		
@@ -172,6 +175,7 @@ class frmRelays ( wx.Frame ):
 		self.Bind( wx.EVT_MENU, self.OnAllRelaysOffClick, id = self.m_menuItemAllOff.GetId() )
 		self.Bind( wx.EVT_MENU, self.OnRefreshAllRelaysClick, id = self.m_menuItemRefresh.GetId() )
 		self.Bind( wx.EVT_MENU, self.OnMenuHelp, id = self.m_menuItemHelp.GetId() )
+		self.Bind( wx.EVT_MENU, self.OnMenuSourceOnGitHub, id = self.m_menuItemSource.GetId() )
 		self.Bind( wx.EVT_MENU, self.OnMenuUpdates, id = self.m_menuItemUpdates.GetId() )
 		self.Bind( wx.EVT_MENU, self.OnAboutClick, id = self.m_menuItemAbout.GetId() )
 	
@@ -238,6 +242,9 @@ class frmRelays ( wx.Frame ):
 		event.Skip()
 	
 	def OnMenuHelp( self, event ):
+		event.Skip()
+	
+	def OnMenuSourceOnGitHub( self, event ):
 		event.Skip()
 	
 	def OnMenuUpdates( self, event ):

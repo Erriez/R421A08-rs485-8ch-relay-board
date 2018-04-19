@@ -486,6 +486,10 @@ class RelayGUI(frmRelays):
             self.m_statusBar.SetStatusText('Error: Serial port disconnected.')
 
     def OnMenuHelp(self, event=None):
+        # Open Github Wiki page in new browser tab
+        webbrowser.open(SOURCE_URL + '/wiki', new=2)
+
+    def OnMenuSourceOnGitHub(self, event=None):
         # Open Github main page in new browser tab
         webbrowser.open(SOURCE_URL, new=2)
 
