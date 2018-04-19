@@ -61,6 +61,10 @@ This project requires a RS485 - USB dongle which is widely available, for exampl
 
 ![Screenshot MODBUS GUI](https://raw.githubusercontent.com/Erriez/R421A08-rs485-8ch-relay-board/master/images/screenshot_commandline.png)
 
+### Screenshot relay toggle example
+
+![Screenshot MODBUS GUI](https://raw.githubusercontent.com/Erriez/R421A08-rs485-8ch-relay-board/master/images/screenshot_wxPython_relay_toggle_gui.png)
+
 ## Installation 
 
 Installation PySerial Windows:
