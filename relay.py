@@ -381,7 +381,7 @@ def argument_parser(args):
         sys.exit(0)
 
     # Create relay_modbus object
-    _modbus = relay_modbus.Modbus(_args.serial_port)
+    _modbus = relay_modbus.Modbus(_args.serial_port, verbose=_args.verbose)
     try:
         _modbus.open()
     except serial.SerialException:
