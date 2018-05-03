@@ -50,19 +50,19 @@ This project requires a RS485 - USB dongle which is widely available, for exampl
 
 ### Screenshot R421A08 relay GUI
 
-![Screenshot R421A08 Relay Control GUI](https://raw.githubusercontent.com/Erriez/R421A08-rs485-8ch-relay-board/master/images/screenshot_R421A08_relay_control_gui.png)
+![Screenshot R421A08 Relay Control GUI](https://raw.githubusercontent.com/Erriez/R421A08-rs485-8ch-relay-board/master/screenshots/screenshot_R421A08_relay_control_gui.png)
 
 ### Screenshot MODBUS GUI
 
-![Screenshot MODBUS GUI](https://raw.githubusercontent.com/Erriez/R421A08-rs485-8ch-relay-board/master/images/screenshot_modbus_gui.png)
+![Screenshot MODBUS GUI](https://raw.githubusercontent.com/Erriez/R421A08-rs485-8ch-relay-board/master/screenshots/screenshot_modbus_gui.png)
 
 ### Screenshot commandline
 
-![Screenshot MODBUS GUI](https://raw.githubusercontent.com/Erriez/R421A08-rs485-8ch-relay-board/master/images/screenshot_commandline.png)
+![Screenshot MODBUS GUI](https://raw.githubusercontent.com/Erriez/R421A08-rs485-8ch-relay-board/master/screenshots/screenshot_commandline.png)
 
 ### Screenshot relay toggle example
 
-![Screenshot MODBUS GUI](https://raw.githubusercontent.com/Erriez/R421A08-rs485-8ch-relay-board/master/images/screenshot_wxPython_relay_toggle_gui.png)
+![Screenshot MODBUS GUI](https://raw.githubusercontent.com/Erriez/R421A08-rs485-8ch-relay-board/master/screenshots/screenshot_wxPython_relay_toggle_gui.png)
 
 
 
