@@ -36,6 +36,10 @@ The following hardware is required for this project:
 **WARNING: DO NOT USE THIS RELAY BOARD WITH 230V AC!**  
 The distance between relay traces on the PCB are < 2mm without holes for isolation. This is dangerous when using it with high voltages. See the picture above.
 
+### R421B16 relay board
+
+The 16 relay board version works by changing `NUM_RELAYS = 16` in `R421A08.py` as reported by a user in [issue #1](https://github.com/Erriez/R421A08-rs485-8ch-relay-board/issues/1).
+
 ### RS485 - USB dongle
 
 This project requires a RS485 - USB dongle which is widely available, for example:
