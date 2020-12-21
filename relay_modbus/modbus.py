@@ -60,7 +60,7 @@ DEFAULT_BAUDRATE = 9600
 # Wait at least 3.5 char between frames
 # However, some USB - RS485 dongles requires at least 10ms to switch between TX and RX, so use a
 # save delay between frames
-FRAME_DELAY = 0.010
+FRAME_DELAY = 0.025
 
 # Frame receive timeout
 FRAME_RX_TIMEOUT = 0.050
