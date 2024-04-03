@@ -5,7 +5,7 @@ cx-Freeze==6.13.1
 numpy==1.24.1
 packaging==22.0
 patchelf==0.17.0.0
-Pillow==10.2.0
+Pillow==10.3.0
 pyinstaller==5.13.1
 pyinstaller-hooks-contrib==2022.14
 pyserial==3.5
